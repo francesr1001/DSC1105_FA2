@@ -1,0 +1,176 @@
+---
+title: "DSC_1105_FA2"
+author: "Frances Aneth Rosales"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    css: FA2.css
+---
+<style>
+  body {
+    text-align: justify;
+  }
+</style>
+
+
+<br>
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<br><br><br><br>
+
+# Read & Show Data
+
+
+```{r}
+
+library(readr)
+filepath <- read_csv("cytof_one_experiment.csv")
+head(filepath)
+```
+<span style="color: purple;"> <h1> <li> 1 Using <b> pivot_longer </b> </li> </h1> </span>
+
+```{r pivot_longer}
+
+library(dplyr)
+library(tidyr)
+
+reshaped_data <- filepath %>%
+  pivot_longer(cols = everything(), 
+               names_to = "Protein Identity", 
+               values_to = "Amount")
+
+print(reshaped_data[, c("Protein Identity", "Amount")])
+
+
+
+
+```
+<br><br>
+
+# Number of ROWS
+
+```{r pivot_longer_ROw}
+
+library(dplyr)
+library(tidyr)
+
+reshaped_data <- filepath %>%
+  pivot_longer(cols = everything(), 
+               names_to = "Protein Identity", 
+               values_to = "Amount")
+
+print(nrow(reshaped_data))
+
+
+
+```
+
+
+
+<br><br><br><br>
+
+<span style="color: purple;">  <h1> <li> 2 Using <b> group_by </b> </li> </h1> </span>
+
+
+```{r group_by}
+library(dplyr)
+groupby_function <- reshaped_data %>%
+  group_by(`Protein Identity`) %>%
+  summarise(
+    Median = median(Amount),
+    MAD = mad(Amount)
+  )
+
+```
+
+<br>
+
+<h1> <b> TABLE OF MEDIAN & MAD </b> </h1> 
+
+```{r group_by_html}
+library(magrittr)
+library(kableExtra)
+
+
+kable(groupby_function, "html") %>%
+  kable_styling()
+```
+
+<br><br><br><br>
+
+<span style="color: purple;">  <h1> <b>  3 Spread-Location (s-l) Plot </b> </h1> 
+
+</span>
+
+```{r plott}
+library(ggplot2)
+ggplot(groupby_function, aes(x = MAD, y = Median)) +
+  geom_point() +
+  labs(title = "Spread-Location (s-l) Plot",
+       x = "Median Absolute Deviation (MAD)",
+       y = "Median Protein Level (MPL) ")
+
+
+```
+
+<h1> <b> <li> Interpretation </li> </b> </h1> 
+
+<h3> The relationship between the median absolute deviation (MAD) and the median protein level is shown in the spread-location (s-l) plot. The data exhibits a stable degree of variability, with the majority of observations being centered around a particular median value. A steady, predictable distribution of protein levels with few outliers is shown by the s-l plot. This plot offers important insights into the characteristics of the protein data by assisting in the identification of trends and possible outliers. </h3>
+
+
+<br><br><br><br><br>
+
+
+
+<span style="color: purple;">  <h1> <b> 4 The example_gymnastics_2 DATA: </b> </h1> </span>
+
+
+```{r dcldat}
+
+library(dcldata)
+library(tidyverse)
+
+data(example_gymnastics_2)
+
+exampl_func  = example_gymnastics_2 %>%
+  pivot_longer(cols = -country, 
+               names_to = "event_year", 
+               values_to = "Score") %>%
+  separate(event_year, into = c("Event", "Year"), sep = "_", convert = TRUE)
+
+```
+
+<br>
+ 
+Click to Hide/Show Data
+
+<button onclick="hideoutput()" style="background: #e8ccd7;"> 
+HIDE/SHOW
+</button>
+<div id="codeinputhere4" style="display:block;">
+
+
+<h1> <b> TABLE OF GYMNASTICS_2 </b> </h1> 
+```{r dcldat_table}
+library(magrittr)
+library(kableExtra)
+
+
+kable(exampl_func, "html") %>%
+  kable_styling()
+```
+
+</div>
+<script>
+function hideoutput() {
+  var x = document.getElementById("codeinputhere4");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+    
+    
+  } else {
+    x.style.display = "block";
+  }
+}
+</script>
